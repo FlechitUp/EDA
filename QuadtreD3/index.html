@@ -24,6 +24,13 @@
         stroke: black;
         shape-rendering: crispEdges;  /* Round any decimal pixels so it'll render nicely */
       }
+      .mysvg {
+        position: static;
+        top: 20px;
+        left: 20px;
+        background-color: beige;
+        width: 500px;    
+      }
 
       /*
       //Can use CSS3 Transitions, but not for everything (e.g. change radius size)
@@ -40,16 +47,24 @@
     <script type="text/javascript">
         
   
-      var root;
+      //var root;
+     var xScale;
+     var yScale;
       var w = window.innerWidth,
           h = window.innerHeight,
           margin = { top: 40, right: 20, bottom: 20, left: 40 },
           radius = 4;
 
-      var svg = d3.select("body").append("svg").attr({
+      var svg = d3.select("body").append("svg").attr({    
         width: w,
-        height: h
-      });
+        height: h 
+        });
+      /*.attr("position","absolute")
+      .style("background-color"," beige")
+      .attr("top",20)
+      .attr("left",-20)
+      .attr("width",w+margin.left)
+      .attr("height",h+margin.top);*/
         
      var threShold = 2;//document.getElementById("thresoldInp").value;
      /*function getThreshold(){  //its like my main
@@ -58,113 +73,101 @@
             return threShold;
         }*/
     
-     d3.csv("a1.csv", function(dataset){
-        /*var limLX_ = document.getElementById("lim_lx").value;
-        var limLY_ = document.getElementById("lim_ly").value;
-        var limRX_ = document.getElementById("lim_rx").value;
-        var limRY_ = document.getElementById("lim_ry").value;*/
+     d3.csv("a2short.csv", function(dataset){
         
-         
-        dataset.forEach(function(element){
-            dataset.push({x:parseFloat(element.x),y:parseFloat(element.y)});
-            //element.x = xScale(element.x);
-        });
-        
-        dataset.splice(0,67);
+        //los casteo a float
+        dataset.forEach(function(d){
+                d['x'] = +d['x'];  
+                d['y'] = +d['y'];                
+        });           
         //console.log("despues ",dataset);
-     /* var dataset = [
-        { x: 100, y: 110 },
-        { x: 83, y: 43 },
-        { x: 92, y: 28 },
-        { x: 49, y: 74 },
-        { x: 51, y: 10 },
-        { x: 25, y: 98 },
-        { x: 77, y: 30 },
-        { x: 20, y: 83 },
-        { x: 11, y: 63 },
-        { x:  4, y: 55 },
-        { x:  0, y:  0 },
-        { x: 85, y: 100 },
-        { x: 60, y: 40 },
-        { x: 70, y: 80 },
-        { x: 10, y: 20 },
-        { x: 40, y: 50 },
-        { x: 25, y: 31 }
-      ];*/
-
-      // We're passing in a function in d3.max to tell it what we're maxing (x value)
+     
+     //d3.max to tell it what we're maxing (x value)
       var XleftTop = d3.min(dataset,function(d){return d.x - 2;});        
       var YleftTop = d3.max(dataset,function(d){return d.y + 2;});
       var XRightBottom = d3.max(dataset,function(d){return d.x + 2;});
       var YRightBottom = d3.min(dataset,function(d){return d.y - 2;});       
          
-      console.log("XleftTop ",XleftTop);
+     /* console.log("XleftTop ",XleftTop);
       console.log("YleftTop",YleftTop);
       console.log("XRightBottom ",XRightBottom);
-      console.log("YRightBottom ",YRightBottom );
+      console.log("YRightBottom ",YRightBottom );*/
          
       document.getElementById("lim_lx").value = XleftTop;
       document.getElementById("lim_ly").value = YleftTop;
       document.getElementById("lim_rx").value = XRightBottom;
       document.getElementById("lim_ry").value = YRightBottom;
       
-      root = new quadTree(new Point(XleftTop, YleftTop),new Point(XRightBottom, YRightBottom));
-      console.log(root.botRight, root.topLeft);
+      var root = new quadTree(new Point(XleftTop, YleftTop), new Point(XRightBottom, YRightBottom),h,w);//new Point(-1,1),new Point(1,-1),h,w)
+         
+      console.log(root.RootNode.PBotRig, root.RootNode.PLeftTop);
       //root.setParameters(new Point(limLX_,limLY_), new Point(limRX_,limRY_));
-      
+     
+         
+    /*Testes de unidad
+    root.insert(dataset[0]);
+    console.log("0: x="+dataset[0].x+ " ,y= "+dataset[0].y );
+    root.insert(dataset[1]);
+    console.log("1: x="+dataset[1].x+ " ,y= "+dataset[1].y );
+    root.insert(dataset[0]);
+    console.log("2: x="+dataset[0].x+ " ,y= "+dataset[0].y );
+    root.insert(dataset[2]);
+    console.log("3: x="+dataset[2].x+ " ,y= "+dataset[2].y );
+    root.insert(dataset[3]);
+    console.log(": x="+dataset[3].x+ " ,y= "+dataset[3].y );
+    */
     
-      dataset.forEach(function(element){           
-         //root.insert(element);
+    //Activar whem acabe de probar x unidad    
+   //   dataset.forEach(function(element,i){           
+     //    root.insert(element);
+         //console.log(i+": x="+element.x+ " y="+element.y);         
          /*svg.append("line")
             .attr("x1","70")
             .attr("y1","500")
             .attr("x2","500")
             .attr("y2","500")
             .style("stroke","red");*/
-            
-            
-      });
-    console.log("+++++++++");
+    //  });
+         
+     console.log("+++++++++");
+     //Para busscar un nodo
+     //console.log(root.find(new Point(-0.8,0.5)));
          /*svg.append("line")
             .attr("x1",margin.left)
             .attr("y1",h/2+margin.top)
             .attr("x2",w-margin.right)
             .attr("y2",h/2+margin.top/2)
             .style("stroke","red");*/
-         
-    root.insert(dataset[0]);
-    console.log("e 1");    
-    root.insert(dataset[1]);
-    console.log("e 2");
-    root.insert(dataset[2]);
-    console.log("e 3");
-    root.insert(dataset[3]);
-    
-         
-      
-     console.log("YA imsertee");
-      
+        
          
      //console.log("XleftTop ",XleftTop)
-      var xScale = d3.scale.linear()
+       xScale = d3.scale.linear()
           .domain([XleftTop, XRightBottom])//110]),  d3.max(dataset, function (d) { return d.x + 10; })])
           .range([margin.left, w - margin.right]);  // Set margins for x specific
 
       // We're passing in a function in d3.max to tell it what we're maxing (y value)
-      var yScale = d3.scale.linear()
+       yScale = d3.scale.linear()
           .domain([YleftTop, YRightBottom])// 120]) d3.max(dataset, function (d) { return d.y + 10; })])
           .range([h - margin.bottom, margin.top]);  //Estaba al revez. Set margins for y specific
 
       // Add a X and Y Axis (Note: orient means the direction that ticks go, not position)
       var xAxis = d3.svg.axis().scale(xScale).orient("top");
       var yAxis = d3.svg.axis().scale(yScale).orient("left");
-
+         
+      
+         
+    dataset.forEach(function(element,i){           
+        root.insert(element);    
+    });
+         
+     console.log("+++++++++");
+         
       var circleAttrs = {
           cx: function(d) { return xScale(d.x); },
           cy: function(d) { return yScale(d.y); },
           r: radius
       };
-
+         
       // Adds X-Axis as a 'g' element
       svg.append("g").attr({
         "class": "axis",  // Give class so we can style it
@@ -189,7 +192,6 @@
       // On Click, we want to add data to the array and chart
       svg.on("click", function() {
           var coords = d3.mouse(this);
-
           // Normally we go from data to pixels, but here we're doing pixels to data
           var newData= {
             x: Math.round( xScale.invert(coords[0])),  // Takes the pixel number to convert to number
@@ -199,6 +201,7 @@
           dataset.push(newData);   // Push data to our array
           console.log(dataset); 
             
+          //VIS :
           svg.selectAll("circle")  // For new circle, go through the update process
             .data(dataset)
             .enter()
@@ -206,8 +209,12 @@
             .attr(circleAttrs)  // Get attributes from circleAttrs var
             .on("mouseover", handleMouseOver)
             .on("mouseout", handleMouseOut);
+          //COD : 
+          root.insert(newData);
         })
 
+      
+        
       // Create Event Handlers for mouse
       function handleMouseOver(d, i) {  // Add interactivity
 
@@ -262,6 +269,7 @@
 
     </script>
     <div>
+        <svg ></svg>
         ThreShold <input type="number" id="thresoldInp" value="3"><br><br>
         Lim LeftX <input type="number" step="any" id="lim_lx" value="5">
         Lim LeftY <input type="number" step="any" id="lim_ly" value="5"><br>

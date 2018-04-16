@@ -1,208 +1,267 @@
-class quadTree {    
-    //Point topLeft;
-    //Point botRight;
-    //var cantPoints = []; //[Point*] por cantidad de puntos
-    //var sons = [] ;// <quadTree*> [0]arribaIzq, [1] arrDerec , [2] abajoIzq, [3]abajoDer
-    //var cont;
-    
-    constructor(topL, botR){            
-        this.cantPoints = [];
-        this.sons = [];
-        this.topLeft = topL; //punto
-        this.botRight = botR; //punto
-        this.cont = 0;
-        this.myh=h;
-        this.myw=w;
-        for (var i=0 ; i<4 ; i++ ){
-            this.sons.push(null);
-        }        
-    };
-            
-    enQuad(pointI){        
-        return (pointI.x >= this.topLeft.x &&
-                pointI.x <= this.botRight.x &&
-                pointI.y <= this.topLeft.y &&
-                pointI.y >= this.botRight.y);
+function cortar4(PLeftTop,PBotRig){
+        primtcor("limha",1);
+        svg.append("line")  //horizontal
+            .attr("x1", xScale(PLeftTop.x))
+            .attr("y1", yScale((PBotRig.y+PLeftTop.y)/2))
+            .attr("x2", xScale(PBotRig.x))
+            .attr("y2", yScale((PBotRig.y+PLeftTop.y)/2))
+            .style("stroke","red");
+        
+        svg.append("line")  //vertical
+            .attr("x1", xScale((PBotRig.x+PLeftTop.x)/2))
+            .attr("y1", yScale(PLeftTop.y))
+            .attr("x2", xScale((PBotRig.x+PLeftTop.x)/2))
+            .attr("y2", yScale(PBotRig.y))
+            .style("stroke","red");         
+}
+
+function primtcor(msg, acor){
+    if(acor == 1){
+        return console.log('%c '+msg, 'background: #222; color: #bada55');    
     }
+    if(acor == 2){
+        return console.log('%c '+msg, 'background: #0c8e5c; color: #f8f8f8');
+    }
+    if(acor == 3){
+        return console.log('%c '+msg, 'background: #ff0b69; color: #f8f8f8');
+    }
+    else{
+        console.log('%c '+msg, 'background: #b40499; color: #ffffff');
+    }    
+}
+
+function quadTree(topL,botR,hI,wI){            
+    this.RootNode = new Node(topL,botR,hI,wI);        
+    this.boolHOJAS_T_F = false;
+    this.sons = []; //4 hijas   contenid: quadTrees        
+    for (var i=0 ; i<4 ; i++ ){
+        this.sons.push(null);
+    }       
+}
             
-    find(pointI){
+    quadTree.prototype.enQuad = function(pointI){
+        ///primtcor("ok",1);
+        return Boolean(pointI.x >= this.RootNode.PLeftTop.x &&
+            pointI.x <= this.RootNode.PBotRig.x &&
+            pointI.y <= this.RootNode.PLeftTop.y &&
+            pointI.y >= this.RootNode.PBotRig.y)       
+        //return false;
+    };
+    
+    /*quadTree.prototype.cortar4 = function(){
+        primtcor("limha",1);
+        svg.append("line")  //horizontal
+            .attr("x1", xScale(this.RootNode.PLeftTop.x))
+            .attr("y1", yScale((this.RootNode.PBotRig.y+this.RootNode.PLeftTop.y)/2))
+            .attr("x2", xScale(this.RootNode.PBotRig.x))
+            .attr("y2", yScale((this.RootNode.PBotRig.y+this.RootNode.PLeftTop.y)/2))
+            .style("stroke","red");
+        
+        svg.append("line")  //vertical
+            .attr("x1", xScale((this.RootNode.PBotRig.x+this.RootNode.PLeftTop.x)/2))
+            .attr("y1", yScale(this.RootNode.PLeftTop.y))
+            .attr("x2", xScale((this.RootNode.PBotRig.x+this.RootNode.PLeftTop.x)/2))
+            .attr("y2", yScale(this.RootNode.PBotRig.y))
+            .style("stroke","red");
+        */
+        
+       /* 
+        svg.append("line")  //horizontal
+            .attr("x1", this.topLeft.x)
+            .attr("y1", (this.botRight.y-this.topLeft.y)/2)
+            .attr("x2", this.botRight.x)
+            .attr("y2",(this.botRight.y-this.topLeft.y)/2)
+            .style("stroke","red");
+        
+        svg.append("line")  //vertical
+            .attr("x1", (this.botRight.x-this.topLeft.x)/2)
+            .attr("y1", this.topLeft.y)
+            .attr("x2", (this.botRight.x-this.topLeft.x)/2)
+            .attr("y2", this.botRight.y)
+            .style("stroke","red");*/
+    //}
+            
+    quadTree.prototype.find = function(pointI){ //OUTPUT BOOL        
         if(!this.enQuad(pointI)){
-            console.log("El punto no esta en los limites");
+            primtcor("No",2);
             return false;
         }
-        if(this.findPointInvect(pointI)){
-            return true;
-        }
-        //printLimites();
-        //si esta en la izquierda
-        if ((this.topLeft.x + this.botRight.x) / 2 >= pointI.x){
-
-            if ((this.topLeft.y + this.botRight.y) / 2 <= pointI.y){   //esta arriba / en sons[0]
-                console.log(" 0 - ");                
-                //printLimites();
-                if(this.sons[0]==null){
-                    return this.findPointInvect(pointI);
-                }
-                return this.sons[0].find(pointI);
+        else{
+            primtcor("si",2);
+            if(this.boolHOJAS_T_F==false){
+                primtcor("No hay hojas",2);
+                return this.findPointInvect(pointI);
             }
-            else{                                       //esta abajo / en sons[1]
-                console.log(" 2 - ");
-                //printLimites();
-                if(this.sons[2]==null){
-                    return this.findPointInvect(pointI);
-                }
-                return this.sons[2].find(pointI);
-            }
-        }
-        else{  //esta en el lado derecho
-            if ((this.topLeft.y + this.botRight.y) / 2 <= pointI.y){   //esta arriba / en sons[1]
-                console.log(" 1 - ");
-                //printLimites();
-                if (this.sons[1] == null){
-                    return this.findPointInvect(pointI);
-                }
-                return this.sons[1].find(pointI);;
-            }
-            else{                                  //esta abajo / en sons[3]
-                console.log(" 3 - ");
-                //printLimites();
-                if (this.sons[3] == null){
-                    return this.findPointInvect(pointI);
-                }
-                return this.sons[3].find(pointI);
+            else{
+                primtcor("hay hojas",2);                
+                for(var f = 0; f< this.sons.length ; f++){
+                    if(this.sons[f]!=null){
+                        if (this.sons[f].find(pointI)){
+                            console.log(f+" ");
+                            return true;
+                        }
+                    }
+                }return false;            
             }
         }
     }
             
-    findPointInvect(pointI){    
-        this.cantPoints.forEach( function(d){
-            //console.log("emtre");
-            if(d.x == pointI.x && d.y == pointI.y){
-                console.log("findPointInvect true" );
+    quadTree.prototype.findPointInvect = function(pointI){                
+        for(var j = 0 ; j < this.RootNode.data.length ;  j++){
+            if(this.RootNode.data[j].x == pointI.x && this.RootNode.data[j].y == pointI.y){               
                 return true;
             }    
-        });
-        
-        /*for (var i=0; i< this.cantPoints.length ; i++){
-            console.log("emfor");
-            if (this.cantPoints[i].x == pointI.x && this.cantPoints[i].y == pointI.y){
-                console.log("findPointInvect true" );
-                return true;
-            }
-        }*/
-        
+        }
+        //);        
         return false;
     }
             
-    insert(pointI){
+    quadTree.prototype.insert = function(pointI){  //OUTPUT BOOL 
         
-        if(!this.enQuad(pointI)){  //*pointI
-            console.log(" punto " ,pointI.x ,",",pointI.y ," No Pertenece a quad");
-            return;
+        if (!this.enQuad(pointI)){ //si NO esta em los limites            
+            primtcor("out of limit",2);
+            return false;
         }
-        else {            
-           console.log("pushi ",pointI.x," , ", pointI.y);
-            if(this.find(pointI) == true){
-                console("Punto ya ingresado");
+        
+        else {
+            if(this.findPointInvect(pointI)){  //Si lo encuentra en el vector
+                primtcor("Objeto repetido",2);
                 return false;
-            }
+            }  
             else {
-            //if(parseInt(this.cantPoints.length)<=threShold && this.findPointInvect(pointI) == false){   //si no encuentra el pto en el array del nodo
-                //console.log("findPointInvect F  ");
-                this.cantPoints.push(pointI);
-                this.cont ++;
-            //}
-           // else{
-            //alert("ok "+parseInt(this.cantPoints.length) );
-            if(parseInt(this.cantPoints.length) > threShold && this.cont>threShold ){
-                console.log("reordenar");
-                cortarEnCuatro(this.myh,this.myw);
-                //this.cantPoints.forEach(function(d,iter){                        
-                  
-                for(var i = 0 ; i < parseInt(this.cantPoints.length) ; i++){
-                    /// si esta en el lado izquierd
-                    if ((this.topLeft.x + this.botRight.x) / 2 >= this.cantPoints[i].x){    //pointI->x
-                        //Si esta arriba a la izquierda
-                        if ((this.topLeft.y + this.botRight.y) / 2 <= this.cantPoints[i].y){
-                            console.log("  sons[0] ");
-                            if (this.sons[0] == null){ //sons[0] topLeftTree
-                                this.sons[0] = new quadTree(
-                                    new Point(this.topLeft.x, this.topLeft.y),
-                                    new Point((this.topLeft.x + this.botRight.x) / 2,
-                                              (this.topLeft.y + this.botRight.y) / 2));
-                            }
-                            //alert("recuri");
-                            return this.sons[0].insert(this.cantPoints[i]);
-                        }
-                            
-                        // si esta en la izquierda abajo
-                            else{
-                                if (this.sons[2]  == null){
-                                    this.sons[2]  = new quadTree(  //sons[2] botLeftTree
-                                        new Point(this.topLeft.x,(this.topLeft.y + this.botRight.y) / 2),
-                                        new Point((this.topLeft.x + this.botRight.x) / 2,this.botRight.y));
+                if (this.RootNode.data.length < threShold && this.boolHOJAS_T_F == false){  //si el array data tiene espacio
+                    this.RootNode.setData(pointI);   //hacer push
+                    //primtcor("push",2);
+                    return true;                    
+                }
+                else { //si no hay espacio en el array data                    
+                    console.log("reacomodar");                    
+                    cortar4(this.RootNode.PLeftTop,this.RootNode.PBotRig);
+                    //d3.selectAll()
+                    
+                    //paso los elementos de data al sons[]
+                    
+                    this.RootNode.setData(pointI);   //hacer push
+                    //primtcor("push paara acomodar",2);
+                                
+                    for(var m  = 0 ; m<this.RootNode.data.length ; m++ ){
+                        var d = this.RootNode.data[m];
+                        //si esta en el lado izq
+                        if((this.RootNode.PBotRig.x+this.RootNode.PLeftTop.x)/2 >= this.RootNode.data[m].x ){
+                            //primtcor("IZQ ",3);
+                            //si esta arriba o sons[0]
+                            if((this.RootNode.PLeftTop.y+this.RootNode.PBotRig.y)/2 <= d.y){
+                                //primtcor("  ARR",3);
+                                //si esta arribaa o sons[0]
+                                if(this.sons[0]==null){
+                                    //primtcor("    SONS[0] NULL",3);
+                                    this.sons[0] = new quadTree(
+                                        this.RootNode.PLeftTop,
+                                        new Point(
+                                            (this.RootNode.PBotRig.x+this.RootNode.PLeftTop.x)/2,
+                                            (this.RootNode.PLeftTop.y+this.RootNode.PBotRig.y)/2),
+                                        this.RootNode.myHI/2,
+                                        this.RootNode.myWI/2);               
+                                } 
+                                //primtcor("Recurividade [0]", 1);
+                                this.sons[0].insert(d);
+                            }         
+                            else{  //si esta abajo o sons[2]
+                                //primtcor("  ABAJO",3);
+                                if(this.sons[2]==null){                             //primtcor("    SONS[2] NULL",3);
+                                    this.sons[2] = new quadTree(                   new Point(
+                                            this.RootNode.PLeftTop.x,
+                                            (this.RootNode.PLeftTop.y+this.RootNode.PBotRig.y)/2
+                                        ),
+                                        new Point(
+                                            (this.RootNode.PBotRig.x+this.RootNode.PLeftTop.x)/2,
+                                            this.RootNode.PBotRig.y
+                                        ),
+                                        this.RootNode.myHI/2,
+                                        this.RootNode.myWI/2
+                                    );                                    
                                 }
-                                //alert("recuri");
-                                return this.sons[2].insert(this.cantPoints[i]);
+                                //primtcor("Recurividade ", 1);
+                                this.sons[2].insert(d);
                             }
                         }
-                        else{
-                            // si esta arriba a la derecha
-                            if ((this.topLeft.y + this.botRight.y) / 2 <= this.cantPoints[i].y){
-                                console.log("  sons[1] ");
-                                if (this.sons[1] == null){ //sons[1] topRightTree
+                        //si esta en el lado derecho
+                        else{  
+                            //primtcor("DER ",3);
+                            //Si esta arriba o sons[1] 
+                            if((this.RootNode.PLeftTop.y+this.RootNode.PBotRig.y)/2<=d.y){
+                                //primtcor("  ARR",3);
+                                if(this.sons[1]==null){
+                                    //primtcor("    SONS[1] NULL",3);
                                     this.sons[1] = new quadTree(
-                                        new Point((this.topLeft.x + this.botRight.x) /  2,this.topLeft.y),
-                                        new Point(this.botRight.x,(this.topLeft.y + this.botRight.y) /  2));
+                                        new Point(
+                                            (this.RootNode.PBotRig.x+this.RootNode.PLeftTop.x)/2, this.RootNode.PLeftTop.y),
+                                        new Point(
+                                            this.RootNode.PBotRig.x,
+                                            (this.RootNode.PLeftTop.y+this.RootNode.PBotRig.y)/2
+                                        ),
+                                        this.RootNode.myHI/2,
+                                        this.RootNode.myWI/2
+                                    );                                    
                                 }
-                                //alert("recuri");
-                                return this.sons[1].insert(this.cantPoints[i]);
+                                //primtcor("Recurividade ", 1);
+                                this.sons[1].insert(d);
                             }
-                            
-                            ///si esta abajo a la derecha
-                            else{
-                                if (this.sons[3] == null){
-                                    console.log("  sons[3] ");
-                                    this.sons[3] = new quadTree( //sons[3] botRightTree
-                                        new Point((this.topLeft.x + this.botRight.x) / 2,   (this.topLeft.y + this.botRight.y) / 2),
-                                        new Point(this.botRight.x, this.botRight.y));
-                                }
-                                //alert("recuri");
-                                this.sons[3].insert(this.cantPoints[i]);
+                            else{ //esta abajo o sons[3]
+                                //primtcor("  ABAJO",3);
+                                if(this.sons[3]==null){
+                                    //primtcor("    SONS[3] NULL",3);
+                                    this.sons[3] = new quadTree(
+                                        new Point(
+                                            (this.RootNode.PBotRig.x+this.RootNode.PLeftTop.x)/2, (this.RootNode.PLeftTop.y+this.RootNode.PBotRig.y)/2),
+                                        this.RootNode.PBotRig,
+                                        this.RootNode.myHI/2,
+                                        this.RootNode.myWI/2
+                                    );    
+                                }      
+                                //primtcor("Recurividade ", 1);
+                                this.sons[3].insert(d);
                             }
                         }
-                    }//);
-                    this.cantPoints =[];
+                    //});                  
+                    }
+                    this.boolHOJAS_T_F = true;
+                    this.RootNode.data = [];
                 }
             }
-            //}
         }
-                
-    } //(Point*)
-            
-    setParameters(a,b){
-        this.topLeft = a;
-        this.botRight = b;                
+        
     }
-    
-    /*void readFile(string);*/
-    printLimites(){
-        console.log("Limit Quad: (", this.topLeft.x, ",",this.topLeft.y,")  (",this.botRight.x,",   ",this.botRight.y," )");
-    }
+/* 
+function cortar4(topLeft, botRight){
+    svg.append("line")  //horizontal
+        .attr("x1", xScale(topLeft.x))
+        .attr("y1", yScale((botRight.y+topLeft.y)/2))
+        .attr("x2", xScale(botRight.x))
+        .attr("y2", yScale((botRight.y+topLeft.y)/2))
+        .style("stroke","red");
+        
+    svg.append("line")  //vertical
+        .attr("x1", xScale((botRight.x+topLeft.x)/2))
+        .attr("y1", yScale(topLeft.y))
+        .attr("x2", xScale((botRight.x+topLeft.x)/2))
+        .attr("y2", yScale(botRight.y))
+        .style("stroke","red");
 }
-       
 
 function cortarEnCuatro(hI,wI){
-    svg.append("line")
+    svg.append("line")  //horizontal
         .attr("x1",margin.left)
         .attr("y1",hI/2+margin.top)
         .attr("x2",wI-margin.right)
         .attr("y2",hI/2+margin.top)
         .style("stroke","red");
-    svg.append("line")
+    
+    svg.append("line") //vertical
         .attr("x1",wI/2+margin.left)
         .attr("y1",margin.top)
         .attr("x2",wI/2+margin.left)
         .attr("y2",hI-margin.bottom)
         .style("stroke","red");
-}   
+}  
+*/
