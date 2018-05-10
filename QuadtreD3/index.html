@@ -9,14 +9,14 @@
     <!--script defer src="main.js"></script-->
     <script src="JS/quadtree.js"></script>
     <!--script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script-->
-
+    <title>My Vis QuadTree</title>
     <!-- CSS (Styling) -->
     <style type="text/css">
 
       body {
         margin: 0;
         font-family: sans-serif;
-        font-size: 11px;
+        font-size: 14px;
       }
 
       .axis path, .axis line {
@@ -31,7 +31,19 @@
         background-color: beige;
         width: 500px;    
       }
-
+    
+      .button {
+        background-color: #7e24e6; /* Green */        
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 14px 12px 8px;
+        cursor: pointer;
+      }
       /*
       //Can use CSS3 Transitions, but not for everything (e.g. change radius size)
       circle:hover{
@@ -43,22 +55,31 @@
   </head>
 
   <body>
+      <h1> My Visual QuadTree</h1>
     <!-- Begin Javascript -->
     <script type="text/javascript">
-        
-  
-      //var root;
-     var xScale;
-     var yScale;
-      var w = window.innerWidth,
-          h = window.innerHeight,
-          margin = { top: 40, right: 20, bottom: 20, left: 40 },
-          radius = 4;
+    var root;
+    var xScale;
+    var yScale;
+    var threShold;   //=2;
+    var w = window.innerWidth,
+        h = window.innerHeight,
+        margin = { top: 40, right: 20, bottom: 20, left: 40 },
+        radius = 2;
 
-      var svg = d3.select("body").append("svg").attr({    
+    var svg = d3.select("body").append("svg").attr({    
         width: w,
         height: h 
         });
+        
+    function principalActions(){
+        
+        threShold =  document.getElementById('thresoldInp').value;    
+                
+        document.getElementById('mybt').disabled=true; 
+  
+     
+     
       /*.attr("position","absolute")
       .style("background-color"," beige")
       .attr("top",20)
@@ -66,7 +87,8 @@
       .attr("width",w+margin.left)
       .attr("height",h+margin.top);*/
         
-     var threShold = 2;//document.getElementById("thresoldInp").value;
+     
+     //document.getElementById("thresoldInp").value;
      /*function getThreshold(){  //its like my main
             threShold = document.getElementById("thresoldInp").value;    
             console.log(threShold);            
@@ -86,7 +108,20 @@
       var XleftTop = d3.min(dataset,function(d){return d.x - 2;});        
       var YleftTop = d3.max(dataset,function(d){return d.y + 2;});
       var XRightBottom = d3.max(dataset,function(d){return d.x + 2;});
-      var YRightBottom = d3.min(dataset,function(d){return d.y - 2;});       
+      var YRightBottom = d3.min(dataset,function(d){return d.y - 2;});  
+         
+      /*if (Math.abs(XleftTop) > Math.abs(XRightBottom)){
+          XRightBottom = Math.abs(XleftTop);
+      }
+      else{
+          XleftTop = -XRightBottom;
+      }
+       
+      if(Math.abs(YleftTop) > Math.abs(YRightBottom) ){
+          YRightBottom = Math.abs(YleftTop);
+      }else{
+          YleftTop = -YRightBottom;
+      }*/
          
      /* console.log("XleftTop ",XleftTop);
       console.log("YleftTop",YleftTop);
@@ -98,7 +133,7 @@
       document.getElementById("lim_rx").value = XRightBottom;
       document.getElementById("lim_ry").value = YRightBottom;
       
-      var root = new quadTree(new Point(XleftTop, YleftTop), new Point(XRightBottom, YRightBottom),h,w);//new Point(-1,1),new Point(1,-1),h,w)
+      root = new quadTree(new Point(XleftTop, YleftTop), new Point(XRightBottom, YRightBottom),h,w);//new Point(-1,1),new Point(1,-1),h,w)
          
       console.log(root.RootNode.PBotRig, root.RootNode.PLeftTop);
       //root.setParameters(new Point(limLX_,limLY_), new Point(limRX_,limRY_));
@@ -147,7 +182,7 @@
 
       // We're passing in a function in d3.max to tell it what we're maxing (y value)
        yScale = d3.scale.linear()
-          .domain([YleftTop, YRightBottom])// 120]) d3.max(dataset, function (d) { return d.y + 10; })])
+          .domain([YRightBottom,YleftTop])// 120]) d3.max(dataset, function (d) { return d.y + 10; })])
           .range([h - margin.bottom, margin.top]);  //Estaba al revez. Set margins for y specific
 
       // Add a X and Y Axis (Note: orient means the direction that ticks go, not position)
@@ -160,7 +195,7 @@
         root.insert(element);    
     });
          
-     console.log("+++++++++");
+     console.log("f+++++++++");
          
       var circleAttrs = {
           cx: function(d) { return xScale(d.x); },
@@ -199,7 +234,7 @@
           };
           
           dataset.push(newData);   // Push data to our array
-          console.log(dataset); 
+          //console.log(dataset); 
             
           //VIS :
           svg.selectAll("circle")  // For new circle, go through the update process
@@ -211,6 +246,7 @@
             .on("mouseout", handleMouseOut);
           //COD : 
           root.insert(newData);
+          console.log(newData);
         })
 
       
@@ -238,7 +274,7 @@
       function handleMouseOut(d, i) {
             // Use D3 to select element, change color back to normal
             d3.select(this).attr({
-              fill: "black",
+              fill: "rgba(26, 25, 25, 0.69)",
               r: radius
             });
 
@@ -248,12 +284,16 @@
         }
         
         });
-
+       }
+        var MYARRSEARCH = [];
         function search(){
             console.log("++++++ search");
+            document.getElementById("resultsearch").value = " ";
             var sptX = document.getElementById("px1").value;
             var sptY = document.getElementById("py1").value;
             root.find(new Point(sptX,sptY));
+            document.getElementById("resultsearch").value =  MYARRSEARCH.reverse().toString();
+            MYARRSEARCH = [];
             return;
         }
         
@@ -269,19 +309,21 @@
 
     </script>
     <div>
-        <svg ></svg>
-        ThreShold <input type="number" id="thresoldInp" value="3"><br><br>
-        Lim LeftX <input type="number" step="any" id="lim_lx" value="5">
-        Lim LeftY <input type="number" step="any" id="lim_ly" value="5"><br>
-        Lim RightX <input type="number" step="any" id="lim_rx" value="5">
-        Limit RighY <input type="number" step="any" id="lim_ry" value="5"><br><br>
-        <button onClick="principalActions()">ok</button> <br>
+        
+        ThreShold <input type="number" id="thresoldInp" value="2"><br><br>
+        Lim LeftX <input type="number" step="any" id="lim_lx" value="5" disabled>
+        Lim LeftY <input type="number" step="any" id="lim_ly" value="5" disabled><br>
+        Lim RightX <input type="number" step="any" id="lim_rx" value="5" disabled>
+        Limit RighY <input type="number" step="any" id="lim_ry" value="5" disabled><br><br>
+        <button id="mybt" class="button" onClick="principalActions()">ok</button> <br>
+        <p>Pasar mouse sobre un punto para ver sus coordenadas y buscar</p>
         Search
         <input type="number" step="any" id="px1" value="0.1">
         <input type="number" step="any" id="py1" value="0.5">
-        <button onClick="search()">Search</button> <br>
+        <button class="button" onClick="search()">Search</button> <br>
         <textarea rows="4" cols="50" id="resultsearch"> 
         </textarea>
+        <svg ></svg>
     </div>
     </body>
 </html>

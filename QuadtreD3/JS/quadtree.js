@@ -1,18 +1,22 @@
+var MYCOR = "red";
+var MYCOR2 = "blue";
 function cortar4(PLeftTop,PBotRig){
-        primtcor("limha",1);
+        //primtcor("limha",1);
         svg.append("line")  //horizontal
             .attr("x1", xScale(PLeftTop.x))
             .attr("y1", yScale((PBotRig.y+PLeftTop.y)/2))
             .attr("x2", xScale(PBotRig.x))
             .attr("y2", yScale((PBotRig.y+PLeftTop.y)/2))
-            .style("stroke","red");
+            .style("stroke",MYCOR);
         
         svg.append("line")  //vertical
             .attr("x1", xScale((PBotRig.x+PLeftTop.x)/2))
             .attr("y1", yScale(PLeftTop.y))
             .attr("x2", xScale((PBotRig.x+PLeftTop.x)/2))
             .attr("y2", yScale(PBotRig.y))
-            .style("stroke","red");         
+            .style("stroke",MYCOR);   
+    MYCOR = MYCOR2;
+    
 }
 
 function primtcor(msg, acor){
@@ -80,7 +84,8 @@ function quadTree(topL,botR,hI,wI){
             .attr("y2", this.botRight.y)
             .style("stroke","red");*/
     //}
-            
+         
+    
     quadTree.prototype.find = function(pointI){ //OUTPUT BOOL        
         if(!this.enQuad(pointI)){
             primtcor("No",2);
@@ -97,6 +102,7 @@ function quadTree(topL,botR,hI,wI){
                 for(var f = 0; f< this.sons.length ; f++){
                     if(this.sons[f]!=null){
                         if (this.sons[f].find(pointI)){
+                            MYARRSEARCH.push(f);
                             console.log(f+" ");
                             return true;
                         }
@@ -105,6 +111,7 @@ function quadTree(topL,botR,hI,wI){
             }
         }
     }
+   
             
     quadTree.prototype.findPointInvect = function(pointI){                
         for(var j = 0 ; j < this.RootNode.data.length ;  j++){
@@ -125,18 +132,20 @@ function quadTree(topL,botR,hI,wI){
         
         else {
             if(this.findPointInvect(pointI)){  //Si lo encuentra en el vector
-                primtcor("Objeto repetido",2);
+                //primtcor("Objeto repetido",2);
                 return false;
             }  
             else {
-                if (this.RootNode.data.length < threShold && this.boolHOJAS_T_F == false){  //si el array data tiene espacio
+                if (this.RootNode.data.length < threShold && this.boolHOJAS_T_F == false){  //si el array data tiene espacio y no ha creado nodos hijos
                     this.RootNode.setData(pointI);   //hacer push
                     //primtcor("push",2);
                     return true;                    
                 }
                 else { //si no hay espacio en el array data                    
-                    console.log("reacomodar");                    
-                    cortar4(this.RootNode.PLeftTop,this.RootNode.PBotRig);
+                    //console.log("reacomodar");                    
+                    cortar4(this.RootNode.PLeftTop,this.RootNode.PBotRig);                    
+                    
+                    
                     //d3.selectAll()
                     
                     //paso los elementos de data al sons[]
@@ -163,7 +172,7 @@ function quadTree(topL,botR,hI,wI){
                                         this.RootNode.myHI/2,
                                         this.RootNode.myWI/2);               
                                 } 
-                                //primtcor("Recurividade [0]", 1);
+                                //primtcor("Recurisidade [0]", 1);
                                 this.sons[0].insert(d);
                             }         
                             else{  //si esta abajo o sons[2]
