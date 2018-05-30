@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<!-- How to create Mouse Events for D3 -->
+<html>
+
+  <head>
+    <!-- Load D3 from site -->
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script type='text/javascript' src="js/rtree.js"></script>
+
+    <!-- CSS (Styling) -->
+    <style type="text/css">
+
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        font-size: 11px;
+      }
+
+      .axis path, .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;  /* Round any decimal pixels so it'll render nicely */
+      }
+
+      /*
+      //Can use CSS3 Transitions, but not for everything (e.g. change radius size)
+      circle:hover{
+        fill: green;
+      }
+      */
+
+    </style>
+  </head>
+
+  <body>
+    <!-- Begin Javascript -->
+	<svg></svg>
+    <script type="text/javascript">
+	  var MOIU ; 
+	  var cols =['#B01E1E','#174385','#15592F','#FCDC0A','#000000'];
+	  var myID = 0;	 
+      var w = window.innerWidth-100;
+      var h = window.innerHeight-100,
+          margin = { top: 40, right: 20, bottom: 20, left: 40 },
+          radius = 6;
+	  var rt = new RTree();
+      var svg = d3.select("body").select("svg").attr({
+        width: w,
+        height: h,
+		id: "mysvg"
+      });
+	  svg.append("line")
+		.style("stroke", "black")
+		.style("stroke-width","4")
+		.attr("x1",0)
+		.attr("y1",0)
+		.attr("x2",w)
+		.attr("y2",0);
+	
+	svg.append("line")
+		.style("stroke", "black")
+		.style("stroke-width","4")
+		.attr("x1",0)
+		.attr("y1",h)  //h
+		.attr("x2",w)  //w
+		.attr("y2",h);  //h
+	svg.append("line")
+		.style("stroke", "black")
+		.style("stroke-width","4")
+		.attr("x1",w)
+		.attr("y1",0)
+		.attr("x2",w)
+		.attr("y2",w);
+		//.style("stroke","#fff")
+		
+
+      var dataset = [
+        { x: 100, y: 110 }/*,
+        { x: 83, y: 43 },
+        { x: 92, y: 28 },
+        { x: 49, y: 74 },
+        { x: 51, y: 10 },
+        { x: 25, y: 98 },
+        { x: 77, y: 30 },
+        { x: 20, y: 83 },
+        { x: 11, y: 63 },
+        { x:  4, y: 55 },
+        { x:  0, y:  0 },
+        { x: 85, y: 100 },
+        { x: 60, y: 40 },
+        { x: 70, y: 80 },
+        { x: 10, y: 20 },
+        { x: 40, y: 50 },
+        { x: 25, y: 31 }*/
+      ];
+
+      // We're passing in a function in d3.max to tell it what we're maxing (x value)
+      var xScale = d3.scale.linear()
+          .domain([0, d3.max(dataset, function (d) { return d.x + 10; })])
+          .range([margin.left, w - margin.right]);  // Set margins for x specific
+		  //.rangeBands([10, w - 10]);
+
+      // We're passing in a function in d3.max to tell it what we're maxing (y value)
+      var yScale = d3.scale.linear()
+          .domain([0, d3.max(dataset, function (d) { return d.y + 10; })])
+          .range([margin.top, h - margin.bottom]);  // Set margins for y specific
+
+      // Add a X and Y Axis (Note: orient means the direction that ticks go, not position)
+      var xAxis = d3.svg.axis().scale(xScale).orient("top");
+      var yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+	 var rectAttrs = {
+            x: function(d) { return xScale(d.x); },
+            y: function(d) { return yScale(d.y); },
+            width: 20,
+            height: 15, 
+            fill: "#ba9dfd",
+            stroke : '#7ccc1d',
+            "stroke-width" : 1
+        };
+		
+		svg.selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr(rectAttrs);
+				
+		function draw_myrect2(mycoords){  //dibuja sectores
+			var rectAttrs = {
+				x: function() { console.log(mycoords[0] , xScale(mycoords[0])); return xScale(mycoords[0]); },
+				y: function() { console.log(mycoords[1] ,yScale(mycoords[1])); return yScale(mycoords[1]); },	
+				height: function() { console.log("h: ",(mycoords[2])); return yScale(mycoords[2]); },	 //yScale
+				width: function() { console.log("w1: ",(mycoords[3])); return xScale(mycoords[3])-xScale(10); },	//xScale
+				//width: 20,
+				//height: 15, 
+				fill: "rgba(144, 144, 144, 0.29)",//color  
+				stroke : '#7ccc1d',
+				"stroke-width" : 1
+			};
+			
+			/*svg.select("rect")
+                .data(dataset)
+                .enter()*/
+            svg.append("rect")
+				.attr(rectAttrs);
+			
+		}
+		
+		function sortRes(a,b){ return b.layer-a.layer; }
+		
+		function maxMinXNodes(myNode){
+			var myarr = [];
+			var maxMin = [];
+			myarr.push(myNode.x);
+			myNode.nodes.forEach(function(d){myarr.push(d.x)});
+			
+			maxMin.push(Math.max.apply(null,myarr));  //0,myarr   , [0] -> max x
+			myar = [];
+			myarr.push(myNode.y);
+			myNode.nodes.forEach(function(d){myarr.push(d.y)});
+			
+			maxMin.push(Math.max.apply(null,myarr)); //0,myarr	  , [1] -> max y
+ 			
+			//console.log("!!", maxMin[1] );
+			return maxMin;
+		}
+
+		
+		function draw_myrect2Node(myNode){  //dibujar sectores exactos
+			
+			var rectAttrs = {
+				x: function() { return xScale(myNode.x); },
+				y: function() { return yScale(myNode.y); },
+				width: function() {
+					if(myNode.id == "root") {
+						return xScale(rt.getxyMax()[0])+20-xScale(myNode.x);
+					}
+					return xScale(maxMinXNodes(myNode)[0])+20-xScale(myNode.x);}, // -xScale(myNode[0])
+				height: function() {
+					if(myNode.id == "root"){
+						return yScale(rt.getxyMax()[1])+15-yScale(myNode.y);
+					}
+					return yScale(maxMinXNodes(myNode)[1])+15-yScale(myNode.y)},
+				fill: "rgba(144, 144, 144, 0.29)",
+				stroke: '#7ccc1d',
+				"stroke-width": 1
+			}
+			
+			
+			svg.append("rect")
+				.attr(rectAttrs);
+		}
+		
+		
+		function draw_myrect3(mycoords){  //divbuja rectamgulos
+			var rectAttrs = {
+				x: function() { return xScale(mycoords[0]); },
+				y: function() { return yScale(mycoords[1]); },	
+				width: 20,
+				height: 15, 
+				fill: "rgba(144, 144, 144, 0.29)",//color  
+				stroke : '#7ccc1d',
+				"stroke-width" : 1
+			};
+			
+			/*svg.select("rect")
+                .data(dataset)
+                .enter()*/
+            svg.append("rect")
+				.attr(rectAttrs);
+			
+		}
+				
+            
+		function draw_myrect(mycoords , color){
+			var newData2= {
+				x: Math.round( xScale.invert(mycoords[0])),  // Takes the pixel number to convert to number
+				y: Math.round( yScale.invert(mycoords[1]))
+			};
+			dataset.push(newData2);
+			var rectAttrs = {
+				x: function(d) { return xScale(d.x); },
+				y: function(d) { return yScale(d.y); },	
+				width: 20,
+				height: 15, 
+				fill: 'red',//"#ba9dfd",
+				stroke : color,// '#7ccc1d',
+				"stroke-width" : 1
+			};	
+		
+			/*svg.selectAll("rect")
+                .data(dataset)
+                .enter()*/
+             svg.append("rect")
+                .attr(rectAttrs);
+		}
+		
+		function draw_myrect(mycoords ){
+			var newData2= {
+				x: Math.round( xScale.invert(mycoords[0])),  // Takes the pixel number to convert to number
+				y: Math.round( yScale.invert(mycoords[1])),
+				w: 20
+					//aqui podria poner un random para los h  y w
+			};
+			dataset.push(newData2);
+			var rectAttrs = {
+				x: function(d) {  return xScale(d.x); },   //traducciom a coordemadas de html
+				y: function(d) { return yScale(d.y); },	
+				width: function(d) {  return xScale(d.w); },
+				height: 15, 
+				fill: "rgba(144, 144, 144, 0.29)",//color  
+				stroke : '#7ccc1d',
+				"stroke-width" : 1
+			};	
+						
+			svg.selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr(rectAttrs);
+				
+			var local_objs = rt.search({x:newData2.x, y:newData2.y, w:20, h:15});//{x:mycoords[0],y:mycoords[1],w:20,h:15});
+			if (local_objs.length >0){
+				local_objs = local_objs.sort(sortRes);
+			}
+						
+            var new_obj = true;
+			
+			
+            while(local_objs.length > 0){
+				//console.log("AQUI OVERLAP X = ",newData2.x, " Y=", newData2.y );
+                obj = local_objs.pop();
+                if(obj.id == myID)
+			    {
+				    new_obj = false;
+				    break;
+			    }                               
+            }
+			if(new_obj) {obj = {"func":{}, "action":{}, "id":myID}};
+		      myID++;
+           var opts = {color:cols[(Math.random()*100).toFixed()%cols.length]};
+            
+            for (var k in opts)
+                obj[k] = opts[k];
+            //alert("SET");
+            rt.insert({x:newData2.x, y:newData2.y, h:20, w:15},obj);
+			
+		}
+		
+		function remove2(){
+			//alert("borre");
+			var svg2 = d3.select('#mysvg').remove();
+			//s	vg.selectAll("*").remove(); 
+			
+			 while (svg2.lastChild) { svg2.removeChild(svg2.lastChild); } 
+			 //dataset = [];
+			svg = d3.select("body").append("svg").attr({
+				width: w,
+				height: h,
+				id: "mysvg",
+			});
+			svg.append("line")
+				.style("stroke", "black")
+				.style("stroke-width","4")
+				.attr("x1",0)
+				.attr("y1",0)
+				.attr("x2",w)
+				.attr("y2",0);
+	
+			svg.append("line")
+				.style("stroke", "black")
+				.style("stroke-width","4")
+				.attr("x1",0)
+				.attr("y1",h)  //h
+				.attr("x2",w)  //w
+				.attr("y2",h);  //h
+			svg.append("line")
+				.style("stroke", "black")
+				.style("stroke-width","4")
+				.attr("x1",w)
+				.attr("y1",0)
+				.attr("x2",w)
+				.attr("y2",w);
+
+			svg.on("clic",paraOmclic);
+		}
+		
+		function drawallrect(root){			
+			SROOT = root;
+			//dibujar el sector del root (o maior)
+			draw_myrect2Node(root);//([root.x,root.y,root.w,root.h]);//(root);
+			for(var i = 0;  root.nodes.length> i ; i++){
+								
+				//console.log("for");
+				if(root.nodes[i].leaf){
+					//console.log("hoja");
+					draw_myrect3([root.nodes[i].x, root.nodes[i].y, root.nodes[i].w, root.nodes[i].h ] );
+				}
+				else{
+					//if(root.nodes[i].length > 0){
+						//console.log("nodo");
+						draw_myrect2Node(root.nodes[i]);//([root.nodes[i].x,root.nodes[i].y, root.nodes[i].w, root.nodes[i].h ]);//
+						drawallrect(root.nodes[i]);
+					//}
+					
+				}
+			}
+		}
+
+      // On Click, we want to add data to the array and chart
+    svg.on("click", paraOmclic);
+	  
+	function paraOmclic() {
+		//alert("oclic");
+		var coords = d3.mouse(this);
+		draw_myrect(coords);
+		//remove2();
+		//drawallrect(rt.get_tree());
+		//svg = d3.select("body").select("svg");
+		//svg.on("click", paraOmclic);
+                 
+		if(rt.getAlertCh()==true){ 
+			rt.AlertCharge = false;
+			//remove2();
+			//drawallrect(rt.get_tree());
+			//svg = d3.select("body").select("svg");
+			//svg.on("click", paraOmclic);
+		}
+		remove2();
+		drawallrect(rt.get_tree());
+		svg = d3.select("body").select("svg");
+		svg.on("click", paraOmclic);
+		         
+    }
+
+     
+
+    </script>
+  </body>
+</html>
