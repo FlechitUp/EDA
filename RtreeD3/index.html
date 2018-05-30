@@ -133,7 +133,7 @@
 				width: function() { console.log("w1: ",(mycoords[3])); return xScale(mycoords[3])-xScale(10); },	//xScale
 				//width: 20,
 				//height: 15, 
-				fill: "rgba(144, 144, 144, 0.29)",//color  
+				fill: function() { return randomColor()},//"rgba(144, 144, 144, 0.29)",//color  
 				stroke : '#7ccc1d',
 				"stroke-width" : 1
 			};
@@ -164,6 +164,21 @@
 			//console.log("!!", maxMin[1] );
 			return maxMin;
 		}
+		
+		function randomColor(){
+			
+			var o = Math.round;
+			var r = Math.random;
+			var s = 255;
+			return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',0.42)';
+
+			/*var letters = '0123456789ABCDEF';
+			var color = '#';
+			for (var i = 0; i < 6; i++) {
+				color += letters[Math.floor(Math.random() * 16)];
+			}
+			return color;*/
+		}
 
 		
 		function draw_myrect2Node(myNode){  //dibujar sectores exactos
@@ -181,7 +196,12 @@
 						return yScale(rt.getxyMax()[1])+15-yScale(myNode.y);
 					}
 					return yScale(maxMinXNodes(myNode)[1])+15-yScale(myNode.y)},
-				fill: "rgba(144, 144, 144, 0.29)",
+				fill: function() { 
+					if(myNode.id == "root"){
+						return "rgba(144, 144, 144, 0.29)"
+					}
+					return randomColor()
+				},//"rgba(144, 144, 144, 0.29)",
 				stroke: '#7ccc1d',
 				"stroke-width": 1
 			}
@@ -198,7 +218,7 @@
 				y: function() { return yScale(mycoords[1]); },	
 				width: 20,
 				height: 15, 
-				fill: "rgba(144, 144, 144, 0.29)",//color  
+				fill: function() { return randomColor()},//"rgba(144, 144, 144, 0.29)"
 				stroke : '#7ccc1d',
 				"stroke-width" : 1
 			};
@@ -248,7 +268,7 @@
 				y: function(d) { return yScale(d.y); },	
 				width: function(d) {  return xScale(d.w); },
 				height: 15, 
-				fill: "rgba(144, 144, 144, 0.29)",//color  
+				fill: function() { return randomColor()},//"rgba(144, 144, 144, 0.29)",//color  
 				stroke : '#7ccc1d',
 				"stroke-width" : 1
 			};	
@@ -283,7 +303,7 @@
             for (var k in opts)
                 obj[k] = opts[k];
             //alert("SET");
-            rt.insert({x:newData2.x, y:newData2.y, h:20, w:15},obj);
+            rt.insert({x:newData2.x, y:newData2.y, h:15, w:20},obj);
 			
 		}
 		

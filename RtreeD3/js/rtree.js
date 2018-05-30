@@ -199,7 +199,7 @@ var RTree = function(width){
 	 */
 	var _linear_split = function(nodes) {
         AlertCharge = true;
-        alert("spit");
+        //alert("split");
 		var n = _pick_linear(nodes);
 		while(nodes.length > 0)	{
 			_pick_next(nodes, n[0], n[1]);
