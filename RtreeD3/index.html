@@ -125,9 +125,9 @@
                 .data(dataset)
                 .enter()
                 .append("rect")
-                .attr(rectAttrs)
-				.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);
+                .attr(rectAttrs);
+				/*.on("mouseover",handleMouseOver)
+				.on("mouseout",handleMouseOut);*/
 				
 		function draw_myrect2(mycoords){  //dibuja sectores
 			var rectAttrs = {
@@ -146,9 +146,9 @@
                 .data(dataset)
                 .enter()*/
             svg.append("rect")
-				.attr(rectAttrs)
-				.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);
+				.attr(rectAttrs);
+				/*.on("mouseover",handleMouseOver)
+				.on("mouseout",handleMouseOut);*/
 			
 		}
 		
@@ -193,9 +193,7 @@
 		}
 
 		
-		function draw_myrect2Node(myNode){  //dibujar sectores exactos
-			console.log("dibujar sector exacto");
-			
+		function draw_myrect2Node(myNode){  //dibujar sectores exactos		
 			var rectAttrs = {
 				x: function() { return xScale(myNode.x); },
 				y: function() { return yScale(myNode.y); },
@@ -206,10 +204,10 @@
 					return xScale(maxMinXNodes(myNode)[0])+20-xScale(myNode.x);}, // -xScale(myNode[0])
 				height: function() {
 					if(myNode.id == "root"){
-						console.log("hr!! ", yScale(rt.getxyMax()[1])+15-yScale(myNode.y));
+						//console.log("hr!! ", yScale(rt.getxyMax()[1])+15-yScale(myNode.y));
 						return yScale(rt.getxyMax()[1])+15-yScale(myNode.y);
 					}
-					console.log("h!! ",yScale(maxMinXNodes(myNode)[1])+15-yScale(myNode.y));
+					//console.log("h!! ",yScale(maxMinXNodes(myNode)[1])+15-yScale(myNode.y));
 					return yScale(maxMinXNodes(myNode)[1])+15-yScale(myNode.y)},
 				fill: function() { 
 					if(myNode.id == "root"){
@@ -223,9 +221,9 @@
 			
 			
 			svg.append("rect")
-				.attr(rectAttrs)
-				.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);
+				.attr(rectAttrs);
+				/*.on("mouseover",handleMouseOver)
+				.on("mouseout",handleMouseOut);*/
 		}
 		
 		
@@ -244,9 +242,9 @@
                 .data(dataset)
                 .enter()*/
             svg.append("rect")
-				.attr(rectAttrs)
-				.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);
+				.attr(rectAttrs);
+				/*.on("mouseover",handleMouseOver)
+				.on("mouseout",handleMouseOut);*/
 			
 		}				   
 		
@@ -273,9 +271,9 @@
                 .data(dataset)
                 .enter()
                 .append("rect")
-                .attr(rectAttrs)
-				.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);
+                .attr(rectAttrs);
+				/*.on("mouseover",handleMouseOver)
+				.on("mouseout",handleMouseOut);*/
 				
 			var local_objs = rt.search({x:newData2.x, y:newData2.y, w:20, h:15});//{x:mycoords[0],y:mycoords[1],w:20,h:15});
 			if (local_objs.length >0){
@@ -285,8 +283,7 @@
             var new_obj = true;
 			
 			
-            while(local_objs.length > 0){
-				//console.log("AQUI OVERLAP X = ",newData2.x, " Y=", newData2.y );
+            while(local_objs.length > 0){			
                 obj = local_objs.pop();
                 if(obj.id == myID)
 			    {
@@ -346,26 +343,13 @@
 		function drawallrect(root){
 			SROOT = root;
 			//dibujar el sector del root (o maior)
-			draw_myrect2Node(root);//([root.x,root.y,root.w,root.h]);//(root);
+			draw_myrect2Node(root);
 			for(var i = 0;  root.nodes.length> i ; i++){
-				//console.log("for");
 				draw_myrect2Node(root.nodes[i]);
-				//draw_myrect2Node(root.nodes[i])
 				
 				if(!root.nodes[i].leaf){
-					console.log(i,"recursividad");
 					drawallrect(root.nodes[i]);
-					
-				}
-				/*if(root.nodes[i].leaf){
-					//draw_myrect3([root.nodes[i].x, root.nodes[i].y, root.nodes[i].w, root.nodes[i].h ] );
-					draw_myrect2Node(root.nodes[i]);
-				}
-				else{					
-					//console.log("nodo");
-					draw_myrect2Node(root.nodes[i]);//([root.nodes[i].x,root.nodes[i].y, root.nodes[i].w, root.nodes[i].h ]);//
-					drawallrect(root.nodes[i]);
-				}*/
+				}				
 			}
 		}
 
@@ -386,7 +370,7 @@
 		svg.on("click", paraOmclic);
 		         
     }
-
+/*
 	function handleMouseOver(d,i){
 		d3.select(this).attr({
               fill: "rgba(255, 165, 0, 0.45)",             
@@ -402,7 +386,7 @@
 		
 		//console.log("select  x = ", d.x, " y= ",d.y );
 	}
-     
+    */ 
 
     </script>
   </body>

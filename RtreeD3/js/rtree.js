@@ -197,10 +197,10 @@ var RTree = function(width){
 	 * [ an array of two new arrays of nodes ] = linear_split(array of nodes)
 	 * @private
 	 */
-	var _linear_split = function(nodes) {
+	var _quadratic_split = function(nodes) {
         AlertCharge = true;
         //alert("split");
-		var n = _pick_linear(nodes);
+		var n = _pick_seds(nodes);
 		while(nodes.length > 0)	{
 			_pick_next(nodes, n[0], n[1]);
 		}
@@ -253,10 +253,10 @@ var RTree = function(width){
 	};
 
 	/* pick the "best" two starter nodes to use as seeds using the "linear" criteria
-	 * [ an array of two new arrays of nodes ] = pick_linear(array of source nodes)
+	 * [ an array of two new arrays of nodes ] = pick_seeds(array of source nodes)
 	 * @private
 	 */
-	var _pick_linear = function(nodes) {
+	var _pick_seds = function(nodes) {    /* pick_linear*/
 		var lowest_high_x = nodes.length-1;
 		var highest_low_x = 0;
 		var lowest_high_y = nodes.length-1;
@@ -402,7 +402,7 @@ var RTree = function(width){
 				}	else { // Otherwise Split this Node
 					// linear_split() returns an array containing two new nodes
 					// formed from the split of the previous node's overflow
-					var a = _linear_split(bc.nodes);
+					var a = _quadratic_split(bc.nodes);
 					ret_obj = a;//[1];
 					
 					if(tree_stack.length < 1)	{ // If are splitting the root..
