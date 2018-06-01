@@ -1,12 +1,11 @@
 var RTree = function(width){
-	// Variables to control tree-dimensions
     var AlertCharge = false;
 	var xyMIN = [Infinity, Infinity];
 	var xyMAX = [-10,-10];
-	var _Min_Width = 3;  // Minimum width of any node before a merge
-	var _Max_Width = 6;  // Maximum width of any node before a split
+	var _Min_Width = 3;  // # elem. minimo de cada nodo 
+	var _Max_Width = 6;  // # elem. maximo de cada nodo
 	if(!isNaN(width)){ _Min_Width = Math.floor(width/2.0); _Max_Width = width;}
-	// Start with an empty root-tree
+	// root por defecto
 	var _T = {x:0, y:0, w:0, h:0, id:"root", nodes:[] };
     
 	var isArray = function(o) {
@@ -21,11 +20,7 @@ var RTree = function(width){
 		return xyMIN;
 	};
 		
-	/* @function
-	 * @description Function to generate unique strings for element IDs
-	 * @param {String} n			The prefix to use for the IDs generated.
-	 * @return {String}				A guarenteed unique ID.
-	 */
+	
     var _name_to_id = (function() {
         // hide our idCache inside this closure
         var idCache = {};
@@ -42,9 +37,6 @@ var RTree = function(width){
         }
     })();
 
-	// This is my special addition to the world of r-trees
-	// every other (simple) method I found produced crap trees
-	// this skews insertions to prefering squarer and emptier nodes
 	RTree.Rectangle.squarified_ratio = function(l, w, fill) {
 	  // Area of new enlarged rectangle
 	  var lperi = (l + w) / 2.0; // Average size of a side of the new rectangle
@@ -56,10 +48,6 @@ var RTree = function(width){
 	  return(larea * fill / lgeo); 
 	};
 	
-	/* find the best specific node(s) for object to be deleted from
-	 * [ leaf node parent ] = _remove_subtree(rectangle, object, root)
-	 * @private
-	 */
 	var _remove_subtree = function(rect, obj, root) {
 		var hit_stack = []; // Contains the elements that overlap
 		var count_stack = []; // Contains the elements that overlap
@@ -138,10 +126,6 @@ var RTree = function(width){
 		return(ret_array);
 	};
 
-	/* choose the best damn node for rectangle to be inserted into
-	 * [ leaf node parent ] = _choose_leaf_subtree(rectangle, root to start search at)
-	 * @private
-	 */
 	var _choose_leaf_subtree = function(rect, root) {
 		var best_choice_index = -1;
 		var best_choice_stack = [];
@@ -193,10 +177,6 @@ var RTree = function(width){
 		return(best_choice_stack);
 	};
 
-	/* split a set of nodes into two roughly equally-filled nodes
-	 * [ an array of two new arrays of nodes ] = linear_split(array of nodes)
-	 * @private
-	 */
 	var _quadratic_split = function(nodes) {
         AlertCharge = true;
         //alert("split");
@@ -207,11 +187,7 @@ var RTree = function(width){
 		//console.log("WWWEY", n[0]," & ", n[1]);
 		return(n);
 	};
-	
-	/* insert the best source rectangle into the best fitting parent node: a or b
-	 * [] = pick_next(array of source nodes, target node array a, target node array b)
-	 * @private
-	 */
+
 	var _pick_next = function(nodes, a, b) {
 	  // Area of new enlarged rectangle
 		var area_a = RTree.Rectangle.squarified_ratio(a.w, a.h, a.nodes.length+1);
@@ -252,10 +228,6 @@ var RTree = function(width){
 		}
 	};
 
-	/* pick the "best" two starter nodes to use as seeds using the "linear" criteria
-	 * [ an array of two new arrays of nodes ] = pick_seeds(array of source nodes)
-	 * @private
-	 */
 	var _pick_seds = function(nodes) {    /* pick_linear*/
 		var lowest_high_x = nodes.length-1;
 		var highest_low_x = 0;
@@ -300,10 +272,6 @@ var RTree = function(width){
 		return(node);
 	};
 
-	/* non-recursive internal search function 
-	 * [ nodes | objects ] = _search_subtree(rectangle, [return node data], [array to fill], root to begin search at)
-	 * @private
-	 */
 	var _search_subtree = function(rect, return_node, return_array, root) {
 		var hit_stack = []; // Contains the elements that overlap
 	
@@ -346,10 +314,6 @@ var RTree = function(width){
 		return(return_array);
 	};
 	
-	/* non-recursive internal insert function
-	 * [] = _insert_subtree(rectangle, object to insert, root to begin insertion at)
-	 * @private
-	 */
 	var _insert_subtree = function(node, root) {
 		var bc; // Best Current node
 		// Initial insertion is special because we resize the Tree and we don't
@@ -617,9 +581,8 @@ var RTree = function(width){
 //End of RTree
 };
 
-/* Rectangle - Generic rectangle object - Not yet used */
 
-RTree.Rectangle = function(ix, iy, iw, ih) { // new Rectangle(bounds) or new Rectangle(x, y, w, h)
+RTree.Rectangle = function(ix, iy, iw, ih) { //new Rectangle(bounds) or new Rectangle(x, y, w, h)
     var x, x2, y, y2, w, h;
 
     if(ix.x) {
@@ -674,31 +637,18 @@ RTree.Rectangle = function(ix, iy, iw, ih) { // new Rectangle(bounds) or new Rec
 			x2 = x + w; y2 = y + h; // For extra fastitude
 		}
 	};
-//End of RTree.Rectangle
+	
 };
 
-
-/* returns true if rectangle 1 overlaps rectangle 2
- * [ boolean ] = overlap_rectangle(rectangle a, rectangle b)
- * @static function
- */
 RTree.Rectangle.overlap_rectangle = function(a, b) {
    // alert("a.x = "+ a.x+ "<" + b.x+b.w +" and "+ a.x+a.w+ ">"+ b.x+" && "+ a.y+ " < "+b.y+b.h +" and "+ a.y+a.h +" > "+b.y);
 	return(a.x < (b.x+b.w) && (a.x+a.w) > b.x && a.y < (b.y+b.h) && (a.y+a.h) > b.y);
 };
 
-/* returns true if rectangle a is contained in rectangle b
- * [ boolean ] = contains_rectangle(rectangle a, rectangle b)
- * @static function
- */
 RTree.Rectangle.contains_rectangle = function(a, b) {
 	return((a.x+a.w) <= (b.x+b.w) && a.x >= b.x && (a.y+a.h) <= (b.y+b.h) && a.y >= b.y);
 };
 
-/* expands rectangle A to include rectangle B, rectangle B is untouched
- * [ rectangle a ] = expand_rectangle(rectangle a, rectangle b)
- * @static function
- */
 RTree.Rectangle.expand_rectangle = function(a, b)	{
 	var nx = Math.min(a.x, b.x);
 	var ny = Math.min(a.y, b.y);
@@ -708,12 +658,6 @@ RTree.Rectangle.expand_rectangle = function(a, b)	{
 	return(a);
 };
 
-/* generates a minimally bounding rectangle for all rectangles in
- * array "nodes". If rect is set, it is modified into the MBR. Otherwise,
- * a new rectangle is generated and returned.
- * [ rectangle a ] = make_MBR(rectangle array nodes, rectangle rect)
- * @static function
- */
 RTree.Rectangle.make_MBR = function(nodes, rect) {
 	if(nodes.length < 1)
 		return({x:0, y:0, w:0, h:0});

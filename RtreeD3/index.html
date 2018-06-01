@@ -184,12 +184,6 @@
 			var s = 255;
 			return 'rgba(' + o(r()*s) + ',' + o(r()*s) + ',' + o(r()*s) + ',0.42)';
 
-			/*var letters = '0123456789ABCDEF';
-			var color = '#';
-			for (var i = 0; i < 6; i++) {
-				color += letters[Math.floor(Math.random() * 16)];
-			}
-			return color;*/
 		}
 
 		
@@ -203,11 +197,9 @@
 					}
 					return xScale(maxMinXNodes(myNode)[0])+20-xScale(myNode.x);}, // -xScale(myNode[0])
 				height: function() {
-					if(myNode.id == "root"){
-						//console.log("hr!! ", yScale(rt.getxyMax()[1])+15-yScale(myNode.y));
+					if(myNode.id == "root"){						
 						return yScale(rt.getxyMax()[1])+15-yScale(myNode.y);
 					}
-					//console.log("h!! ",yScale(maxMinXNodes(myNode)[1])+15-yScale(myNode.y));
 					return yScale(maxMinXNodes(myNode)[1])+15-yScale(myNode.y)},
 				fill: function() { 
 					if(myNode.id == "root"){
@@ -222,8 +214,6 @@
 			
 			svg.append("rect")
 				.attr(rectAttrs);
-				/*.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);*/
 		}
 		
 		
@@ -238,13 +228,8 @@
 				"stroke-width" : 1
 			};
 			
-			/*svg.select("rect")
-                .data(dataset)
-                .enter()*/
             svg.append("rect")
 				.attr(rectAttrs);
-				/*.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);*/
 			
 		}				   
 		
@@ -254,15 +239,14 @@
 				y: Math.round( yScale.invert(mycoords[1])),
 				w: 20,
 				h: 15
-					//aqui podria poner un random para los h  y w
 			};
 			dataset.push(newData2);
 			var rectAttrs = {
 				x: function(d) {  return xScale(d.x); },   //traducciom a coordemadas de html
 				y: function(d) { return yScale(d.y); },	
 				width: function(d) {  return (d.w); }, //20,
-				height: function(d) {  return (d.h); },//15,
-				fill: function() { return randomColor()},//"rgba(144, 144, 144, 0.29)",//color  
+				height: function(d) {  return (d.h); }, //15,
+				fill: function() { return randomColor()}, //"rgba(144, 144, 144, 0.29)",//color  
 				stroke : '#7ccc1d',
 				"stroke-width" : 1
 			};	
@@ -272,8 +256,6 @@
                 .enter()
                 .append("rect")
                 .attr(rectAttrs);
-				/*.on("mouseover",handleMouseOver)
-				.on("mouseout",handleMouseOut);*/
 				
 			var local_objs = rt.search({x:newData2.x, y:newData2.y, w:20, h:15});//{x:mycoords[0],y:mycoords[1],w:20,h:15});
 			if (local_objs.length >0){
@@ -297,15 +279,12 @@
             
             for (var k in opts)
                 obj[k] = opts[k];
-            //alert("SET");
             rt.insert({x:newData2.x, y:newData2.y, h:15, w:20},obj);
 			
 		}
 		
 		function remove2(){
-			//alert("borre");
 			var svg2 = d3.select('#mysvg').remove();
-			//s	vg.selectAll("*").remove(); 
 			
 			 while (svg2.lastChild) { svg2.removeChild(svg2.lastChild); } 
 			 //dataset = [];
@@ -353,7 +332,7 @@
 			}
 		}
 
-      // On Click, we want to add data to the array and chart
+    // On Click, we want to add data to the array and chart
     svg.on("click", paraOmclic);
 	  
 	function paraOmclic() {		
@@ -370,23 +349,6 @@
 		svg.on("click", paraOmclic);
 		         
     }
-/*
-	function handleMouseOver(d,i){
-		d3.select(this).attr({
-              fill: "rgba(255, 165, 0, 0.45)",             
-        });
-		
-		console.log("select  x = ", d, " y= ",i );
-	}
-     
-	function handleMouseOut(d,i){
-		d3.select(this).attr({
-              fill: "rgba(144, 144, 144, 0.29)",             
-        });
-		
-		//console.log("select  x = ", d.x, " y= ",d.y );
-	}
-    */ 
 
     </script>
   </body>
